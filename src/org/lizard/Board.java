@@ -17,12 +17,117 @@ public class Board {
     private Map<String, Map<String, String>> allExits = new HashMap<>();
     private Map<String, Item> allItems = new HashMap<>();
     private Map<Room, List<Map<String, String>>> roomLocks = new HashMap<>();
+    String[][] rooms = new String[8][8];
 
 
     public Board() {
         createMap();
+//        addToVisitedRooms(currentRoom.getName());
     }
+    public void addToVisitedRooms(String roomNombre) {
+//        rooms[7][0] = "Floating Room";
+//        rooms[6][0] = "Land of the Dead";
+//        rooms[5][0] = "Egyptian Room";
+//        rooms[4][0] = "Art Room";
+//        rooms[7][1] = "Engraving Room";
+//        rooms[6][1] = "Loud Room";
+//        rooms[5][1] = "Swinging Stairs";
+//        rooms[6][2] = "Library";
+//        rooms[5][2] = "Key Room";
+//        rooms[4][2] = "Psych Ward";
+//        rooms[7][3] = "Coal Mine";
+//        rooms[6][3] = "Creaky Path";
+//        rooms[5][3] = "Kitchen";
+//        rooms[4][3] = "Closet";
+//        rooms[3][3] = "Riddle Room";
+//        rooms[2][3] = "Whispering Room";
+//        rooms[1][3] = "Treasure Room";
+//        rooms[0][3] = "River";
+//        rooms[1][4] = "Volcano";
+//        rooms[2][4] = "Secret Passage";
+//        rooms[3][4] = "Secret Passage";
+//        rooms[4][4] = "Secret Passage";
+//        rooms[5][4] = "Secret Passage";
+        switch (roomNombre) {
+            case "floatingRoom":
+                rooms[7][0] = "Floating Room";
+                break;
+            case "landOfTheDead":
+                rooms[6][0] = "Land of the Dead";
+                break;
+            case "egyptianRoom":
+                rooms[5][0] = "Egyptian Room";
+                break;
+            case "artRoom":
+                rooms[4][0] = "Art Room";
+                break;
+            case "engravingRoom":
+                rooms[7][1] = "Engraving Room";
+                break;
 
+            case "loudRoom":
+                rooms[6][1] = "Loud Room";
+                break;
+
+            case "swingingStairs":
+                rooms[5][1] = "Swinging Stairs";
+                break;
+
+            case "library":
+                rooms[6][2] = "Library";
+                break;
+
+            case "keyRoom":
+                rooms[5][2] = "Key Room";
+                break;
+
+            case "psychWard":
+                rooms[4][2] = "Psych Ward";
+                break;
+
+            case "coalMine":
+                rooms[7][3] = "Coal Mine";
+                break;
+
+            case "creekyPath":
+                rooms[6][3] = "Creaky Path";
+                break;
+
+            case "kitchen":
+                rooms[5][3] = "Kitchen";
+                break;
+
+            case "closet":
+                rooms[4][3] = "Closet";
+                break;
+
+            case "riddleRoom":
+                rooms[3][3] = "Riddle Room";
+                break;
+
+            case "whisperingRoom":
+                rooms[2][3] = "Whispering Room";
+                break;
+
+            case "treasureRoom":
+                rooms[1][3] = "Treasure Room";
+                break;
+
+            case "river":
+                rooms[0][3] = "River";
+                break;
+
+            case "volcano":
+                rooms[1][4] = "Volcano";
+                break;
+
+            case "secretPassage":
+                rooms[2][4] = "Secret Passage";
+                rooms[3][4] = "Secret Passage";
+                rooms[4][4] = "Secret Passage";
+                rooms[5][4] = "Secret Passage";
+        }
+    }
     public void createMap(){
         // Call XMLParser to gain access to a nodeList of all the rooms in the XML file
         NodeList nodeList = XMLParser("xml/Rooms.xml", "room");
@@ -87,7 +192,7 @@ public class Board {
         addLocksToRooms();
 
         // Set starting room.
-        this.currentRoom = allRooms.get("living");
+        this.currentRoom = allRooms.get("keyRoom");
     }
 
     public Room getCurrentRoom() {
@@ -97,13 +202,13 @@ public class Board {
     public String changeCurrentRoom(String direction) {
         Map<String, Room> exits = currentRoom.getExits();
         Lock lock = currentRoom.getLock(direction);
-
         if(lock != null) {
             return "Seems to be locked.";
         }
         if(exits.containsKey(direction)){
             currentRoom = exits.get(direction);
-            return ("current room is " + currentRoom.getName() + "\n" + currentRoom.getRoomDescription());
+            addToVisitedRooms(currentRoom.getName());
+            return ("You have entered the " + currentRoom.getName() + "\n" + currentRoom.getRoomDescription());
 
         } else {
             return ("That is not an exit.");
@@ -174,15 +279,16 @@ public class Board {
                 String commandInt = itemElement.getElementsByTagName("commandInt").item(0).getTextContent();
                 String commandDirection = itemElement.getElementsByTagName("commandDirection").item(0).getTextContent();
                 String itemDescription = itemElement.getElementsByTagName("description").item(0).getTextContent();
+                String canGrab = itemElement.getElementsByTagName("canGrab").item(0).getTextContent();
 
                 // Create new instance of the item
                 if (lockKey.equals("none")) {
-                    Item roomItem = new Item(itemName, itemDescription);
+                    Item roomItem = new Item(itemName, itemDescription, Boolean.parseBoolean(canGrab));
                     allItems.put(itemName, roomItem);
                     // Add newly created item to its respective room
                     allRooms.get(roomName).addItemToRoom(roomItem);
                 } else {
-                    Item roomItem = new Item(itemName, new Lock(allItems.get(lockKey), lockMessage, new Event(Integer.parseInt(commandInt), directions.getDirection(commandDirection))), itemDescription);
+                    Item roomItem = new Item(itemName, new Lock(allItems.get(lockKey), lockMessage, new Event(Integer.parseInt(commandInt), directions.getDirection(commandDirection))), itemDescription, Boolean.parseBoolean(canGrab));
 
                     // Add newly created item to its respective room
                     allRooms.get(roomName).addItemToRoom(roomItem);
