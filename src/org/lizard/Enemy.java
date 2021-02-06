@@ -9,11 +9,6 @@ public class Enemy {
         this.enemyName = enemyName;
     }
 
-    Enemy(String enemyName, int enemyHP){
-        this.enemyName = enemyName;
-        this.enemyHP = enemyHP;
-    }
-
     public String getEnemyName() {
         return enemyName;
     }
